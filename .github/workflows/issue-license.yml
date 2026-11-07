@@ -1,20 +1,20 @@
-name: Generate Customer License
+name: Generate MadCraves Customer License
 
 on:
   workflow_dispatch:
     inputs:
       customer_name:
-        description: "Customer name"
+        description: "Customer Name"
         required: true
         type: string
 
       customer_machine_id:
-        description: "Customer Machine ID"
+        description: "Customer Machine ID (64 hexadecimal characters)"
         required: true
         type: string
 
       license_duration:
-        description: "License duration"
+        description: "Select License Duration"
         required: true
         type: choice
         options:
@@ -49,10 +49,11 @@ jobs:
           LICENSE_DURATION: ${{ inputs.license_duration }}
         run: node license-issuer.js
 
-      - name: Upload License File
+      - name: Upload Customer License
         uses: actions/upload-artifact@v4
         with:
-          name: Customer-License
+          name: MadCraves-Customer-License
           path: issued-licenses/*.txt
           if-no-files-found: error
           retention-days: 90
+          
