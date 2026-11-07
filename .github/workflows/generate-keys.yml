@@ -1,0 +1,42 @@
+name: Generate License Signing Keys
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  generate-keys:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Generate Ed25519 Keys
+        run: |
+          node -e "
+          const crypto = require('node:crypto');
+          const fs = require('node:fs');
+
+          const keys = crypto.generateKeyPairSync('ed25519', {
+            publicKeyEncoding: { type: 'spki', format: 'pem' },
+            privateKeyEncoding: { type: 'pkcs8', format: 'pem' }
+          });
+
+          fs.writeFileSync('private.pem', keys.privateKey);
+          fs.writeFileSync('public.pem', keys.publicKey);
+          "
+
+      - name: Save Private Key Securely
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          gh secret set LICENSE_PRIVATE_KEY < private.pem
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Upload Public Key
+        uses: actions/upload-artifact@v4
+        with:
+          name: MadCraves-Public-Key
+          path: public.pem
+          retention-days: 90
