@@ -22,21 +22,15 @@ jobs:
             privateKeyEncoding: { type: 'pkcs8', format: 'pem' }
           });
 
-          fs.writeFileSync('private.pem', keys.privateKey);
-          fs.writeFileSync('public.pem', keys.publicKey);
+          fs.writeFileSync('ACS-License-Private-Key.pem', keys.privateKey);
+          fs.writeFileSync('ACS-License-Public-Key.pem', keys.publicKey);
           "
 
-      - name: Save Private Key Securely
-        env:
-          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        run: |
-          gh secret set LICENSE_PRIVATE_KEY < private.pem
-        env:
-          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-
-      - name: Upload Public Key
+      - name: Upload Generated Keys
         uses: actions/upload-artifact@v4
         with:
-          name: MadCraves-Public-Key
-          path: public.pem
-          retention-days: 90
+          name: MadCraves-License-Keys
+          path: |
+            ACS-License-Private-Key.pem
+            ACS-License-Public-Key.pem
+          retention-days: 1
